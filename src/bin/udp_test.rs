@@ -24,7 +24,7 @@ struct Args {
     address: String,
 
     /// Local port to bind to
-    #[arg(short, long, default_value_t = "127.0.0.1:2054", value_parser = clap::value_parser!(String))]
+    #[arg(short, long, default_value_t = ("0.0.0.0:2054").to_string(), value_parser = clap::value_parser!(String))]
     local_address: String,
 
     /// Number of packets to send
@@ -48,18 +48,11 @@ struct Args {
 async fn main() -> io::Result<()> {
     let args = Args::parse();
 
-    let local_address = args.local_address
-        .parse::<SocketAddr>()
-        .unwrap();
+    let local_address = args.local_address.parse::<SocketAddr>().unwrap();
 
     println!("Local address: {}", local_address);
 
-    let sock = UdpSocket::bind(
-        format!("0.0.0.0:{}", args.local_port)
-            .parse::<SocketAddr>()
-            .unwrap(),
-    )
-    .await?;
+    let sock = UdpSocket::bind(&local_address).await?;
 
     let r = Arc::new(sock);
     let s = r.clone();
