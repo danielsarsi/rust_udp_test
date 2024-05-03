@@ -24,8 +24,8 @@ struct Args {
     address: String,
 
     /// Local port to bind to
-    #[arg(short, long, default_value_t = 8080, value_parser = clap::value_parser!(u16))]
-    local_port: u16,
+    #[arg(short, long, default_value_t = "127.0.0.1:2054", value_parser = clap::value_parser!(String))]
+    local_address: String,
 
     /// Number of packets to send
     #[arg(long, default_value_t = 10, value_parser = clap::value_parser!(u64))]
@@ -48,7 +48,7 @@ struct Args {
 async fn main() -> io::Result<()> {
     let args = Args::parse();
 
-    let local_address = format!("0.0.0.0:{}", args.local_port)
+    let local_address = args.local_address
         .parse::<SocketAddr>()
         .unwrap();
 
